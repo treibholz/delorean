@@ -1,5 +1,5 @@
 Delorean is a backup-solution for desktop-computers and especially for
-notebooks.
+notebooks. All backups suck, this one just sucks less.
 
 It was inspired by rsnapshot and TimeMachine on Mac OS X.
 
@@ -16,4 +16,14 @@ A: I don't have a Mac (and I don't want one)
 A: It only works fine over the network with netatalk, which is a PITA.
 
 Q: So what are the advantages and uniqe features of delorean?
-A: (TODO)
+A: It pushes backups via ssh to a server and then drops the copy-as-hardlinks-
+   command on the server, so you have less load on your machine.
+
+Q: And what are the disadvantages?
+A: You need an "intelligent" server, not only a USB-drive (use rsnaphot then)
+   or a simple NAS. You need ssh and rsync (and optionally a dedicated user
+	and a filesystem, that can handle user_xattr on the destination drive),
+	but you don't a special software or a service (except ssh of course)
+	running there! You should be able to get this running on OpenWRT-based
+	Wifi-router with a USB-disk. For further information, read the
+	instructions in the file INSTALL.
