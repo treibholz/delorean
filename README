@@ -5,3 +5,15 @@ It was inspired by rsnapshot and TimeMachine on Mac OS X.
 
 It is written in bash and uses nothing else but standard Linux-tools like
 rsync, ssh and ionice.
+
+
+
+Q: Why not just use rsnapshot?
+A: rsnapshot cannot push backups through ssh, it is just able to pull them.
+
+Q: Why not TimeMachine?
+A: I don't have a Mac (and I don't want one)
+A: It only works fine over the network with netatalk, which is a PITA.
+
+Q: So what are the advantages and uniqe features of delorean?
+A: (TODO)
