@@ -1,2 +1,7 @@
+Delorean is a backup-solution for desktop-computers and especially for
+notebooks.
 
+It was inspired by rsnapshot and TimeMachine on Mac OS X.
 
+It is written in bash and uses nothing else but standard Linux-tools like
+rsync, ssh and ionice.
