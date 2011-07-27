@@ -1,6 +1,7 @@
 #!/bin/bash
-# Copyright by Klaus Umbach <klaus-delorean@uxix.de>
+# Klaus Umbach <klaus-delorean@uxix.de>
 # Licensed under the GPLv3
+# $Id:$ 
 
 ## Configuration
 
@@ -24,7 +25,10 @@ rsync="/usr/bin/rsync --delete -aHAXxv"
 ionice="/usr/bin/ionice -c3"
 date="/bin/date"
 
+# Read external configuration, if available
 test -e /etc/default/delorean && source /etc/default/delorean
+
+# TODO: CLI-parameters
 
 # Year/Month/Day
 today="$($date +%Y)/$($date +%m)/$($date +%d)"
