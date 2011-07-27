@@ -1,14 +1,13 @@
 #!/bin/bash
 # Klaus Umbach <klaus-delorean@uxix.de>
 # Licensed under the GPLv3
-# $Id:$ 
 
 ## Configuration
 
 # default - may be overwritten in /etc/default/delorean
 REMOTE_USER=delorean
 HOST=backupserver
-DEST_PATH=$HOSTNAME
+DEST_PATH=${HOSTNAME}
 LOCK_FILE="/var/run/delorean.pid"
 LAST_FILE="/var/lib/delorean.lastrun"
 STATUS_FILE="/var/lib/delorean.status"
@@ -28,13 +27,17 @@ date="/bin/date"
 # Read external configuration, if available
 test -e /etc/default/delorean && source /etc/default/delorean
 
+export RSYNC_RSH="${FLUXCAPACITOR}"
+
 # TODO: CLI-parameters
 
 # Year/Month/Day
 today="$($date +%Y)/$($date +%m)/$($date +%d)"
 
-if [ "$(cat $LAST_FILE)" == "$today" ]; then
-	exit 0
+if [ -e ${LAST_FILE} ] ; then
+	if [ "$(cat ${LAST_FILE})" == "${today}" ]; then
+		exit 0
+	fi
 fi
 
 ## Code
@@ -64,11 +67,12 @@ else
 	fake_super=''
 fi
 
-rsync_opts=" -e ${FLUXCAPACITOR} ${exclude} ${fake_super}" 
+
+# Assemble the local sync-command
+rsync_opts="${exclude} ${fake_super}" 
 sync_command="${ionice} ${rsync} ${rsync_opts} ${PATHS} ${REMOTE_USER}@${HOST}:${DEST_PATH}/trunk"
 
-#echo $sync_command
-
+# Assemble the remote command to copy the data.
 remote_command="( cd $DEST_PATH && mkdir -p ${today} && \
 	${ionice} -c3 cp -al trunk ${today}/$(${date} +%H-%M) )"
 
@@ -78,14 +82,15 @@ if [ -e ${LOCK_FILE} ]; then
 		if grep ${0} /proc/$(cat ${LOCK_FILE}) ; then
 			echo "still running"
 			echo "Lockfile: ${LOCK_FILE}"
-		exit 0
+			exit 0
+		fi
 	fi
 else
 	echo ${$} >  ${LOCK_FILE}
 
 	# Now here happens the real backup.
-	if (${sync_command}); then
-		# 
+	if (${sync_command})  ; then
+		# Remote stuff to clean up 
 		${FLUXCAPACITOR} ${REMOTE_USER}@${HOST} "${remote_command} > /dev/null & disown"
 		logger -t $(basename ${0}) Backup finished
 		echo "${today}" > ${LAST_FILE}
