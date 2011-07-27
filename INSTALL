@@ -1,0 +1,41 @@
+INSTALL INSTRUCTIONS
+
+
+
+# On the client
+
+add the following line to your /etc/crontab
+
+	23 * * * * root /path/to/delorean.sh
+
+This will run delorean every hour at HH:23
+
+Now create an ssh-key whithout a passphrase for your root-user:
+
+	ssh-keygen
+
+Optionally put delorean.default.example to /etc/default/delorean and fill it
+with your settings in case your server is not called "backupserver".
+
+
+
+# On the server
+
+Optional, but very strongly recommended:
+
+create a dedicated user e.g. "delorean"
+
+	# useradd -d /srv/delorean delorean
+
+You shall not give this user a password! Create
+/srv/delorean/.ssh/authorized_keys and put the public-ssh key of the
+root-user into it.
+
+# And now?
+
+That's all. Now run delorean.sh the first-time manually, so you can accept
+the host-key of your server and do the  initial full-backup.
+
+
+
+
