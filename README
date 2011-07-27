@@ -1,7 +1,7 @@
 Delorean is a backup-solution for desktop-computers and especially for
 notebooks. All backups suck, this one just sucks less.
 
-It was inspired by rsnapshot and TimeMachine on Mac OS X.
+It was inspired by rsnapshot and Time Machine on Mac OS X.
 
 It is written in bash and uses nothing else but standard Linux-tools like
 rsync, ssh and ionice.
@@ -22,8 +22,8 @@ A: It pushes backups via ssh to a server and then drops the copy-as-hardlinks-
 Q: And what are the disadvantages?
 A: You need an "intelligent" server, not only a USB-drive (use rsnaphot then)
    or a simple NAS. You need ssh and rsync (and optionally a dedicated user
-	and a filesystem, that can handle user_xattr on the destination drive),
-	but you don't a special software or a service (except ssh of course)
-	running there! You should be able to get this running on OpenWRT-based
-	Wifi-router with a USB-disk. For further information, read the
-	instructions in the file INSTALL.
+   and a filesystem, that can handle user_xattr on the destination drive),
+   but you don't a special software or a service (except ssh of course)
+   running there! You should be able to get this running on OpenWRT-based
+   Wifi-router with a USB-disk. For further information, read the
+   instructions in the file INSTALL.
