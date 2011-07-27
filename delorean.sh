@@ -9,7 +9,7 @@ REMOTE_USER=delorean
 HOST=backupserver
 DEST_PATH=${HOSTNAME}
 LOCK_FILE="/var/run/delorean.pid"
-REMOTE_LOCK_FILE="/tmp/delorean.pid.${HOSTNAME}"
+REMOTE_LOCK_FILE="/tmp/delorean.lock.${HOSTNAME}"
 LAST_FILE="/var/lib/delorean.lastrun"
 STATUS_FILE="/var/lib/delorean.status"
 
@@ -21,7 +21,7 @@ EXCLUDE=""
 ## binaries
 
 FLUXCAPACITOR="/usr/bin/ssh"
-rsync="/usr/bin/rsync --delete -aHAXxv"
+rsync="nice -n 19 /usr/bin/rsync --delete -aHAXxv"
 ionice="/usr/bin/ionice -c3"
 date="/bin/date"
 
@@ -81,7 +81,8 @@ remote_command="( touch ${REMOTE_LOCK_FILE} && \
 	${ionice} cp -al trunk ${today}/$(${date} +%H-%M) &&\
 	rm ${REMOTE_LOCK_FILE} )"
 
-# Lockfile checking
+
+# local lockfile checking
 if [ -e ${LOCK_FILE} ]; then
 	if [ -d /proc/$(cat ${LOCK_FILE}) ]; then
 		if grep ${0} /proc/$(cat ${LOCK_FILE}) ; then
@@ -90,6 +91,10 @@ if [ -e ${LOCK_FILE} ]; then
 			exit 0
 		fi
 	fi
+# and remote lockfile checking
+elif ${FLUXCAPACITOR} ${REMOTE_USER}@${HOST} "test -e ${REMOTE_LOCK_FILE}"; then 
+			echo "Sorry, still running on the remote side."
+			exit 0
 else
 	echo ${$} >  ${LOCK_FILE}
 
