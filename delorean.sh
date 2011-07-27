@@ -9,6 +9,7 @@ REMOTE_USER=delorean
 HOST=backupserver
 DEST_PATH=${HOSTNAME}
 LOCK_FILE="/var/run/delorean.pid"
+REMOTE_LOCK_FILE="/tmp/delorean.pid.${HOSTNAME}"
 LAST_FILE="/var/lib/delorean.lastrun"
 STATUS_FILE="/var/lib/delorean.status"
 
@@ -34,11 +35,11 @@ export RSYNC_RSH="${FLUXCAPACITOR}"
 # Year/Month/Day
 today="$($date +%Y)/$($date +%m)/$($date +%d)"
 
-if [ -e ${LAST_FILE} ] ; then
-	if [ "$(cat ${LAST_FILE})" == "${today}" ]; then
-		exit 0
-	fi
-fi
+#if [ -e ${LAST_FILE} ] ; then
+#	if [ "$(cat ${LAST_FILE})" == "${today}" ]; then
+#		exit 0
+#	fi
+#fi
 
 ## Code
 
@@ -48,7 +49,7 @@ host $HOST > /dev/null 2> /dev/null || exit 0
 # These are the files, I find useless to backup on a desktop/notebook computer.
 # I'm open to suggestions here!
 
-SYS_EXCLUDE="/tmp/ /var/cache/apt/ /var/tmp/ /var/run/ /var/lib/apt/lists/ /var/lib/clamav/ /var/lib/upower/ /var/lib/sudo/ /var/spool/exim4/ /var/log/ /var/mail/ $LAST_FILE /var/cache/openafs $LOCK_FILE tmp/ mlocate.db var/cache/samba/ .xsession-errors"
+SYS_EXCLUDE="/var/cache/apt/ tmp/ /var/run/ /var/lib/apt/lists/ /var/lib/clamav/ /var/lib/upower/ /var/lib/sudo/ /var/spool/exim4/ /var/log/ /var/mail/ $LAST_FILE /var/cache/openafs $LOCK_FILE mlocate.db var/cache/samba/ .xsession-errors etc/resolv.conf .*.swp etc/mtab var/lib/dhcp/ dev/"
 
 ALL_EXCLUDE="$SYS_EXCLUDE $EXCLUDE"
 
@@ -72,9 +73,13 @@ fi
 rsync_opts="${exclude} ${fake_super}" 
 sync_command="${ionice} ${rsync} ${rsync_opts} ${PATHS} ${REMOTE_USER}@${HOST}:${DEST_PATH}/trunk"
 
+
 # Assemble the remote command to copy the data.
-remote_command="( cd $DEST_PATH && mkdir -p ${today} && \
-	${ionice} -c3 cp -al trunk ${today}/$(${date} +%H-%M) )"
+remote_command="( touch ${REMOTE_LOCK_FILE} && \
+	cd ${DEST_PATH} && \
+	mkdir -p ${today} && \
+	${ionice} cp -al trunk ${today}/$(${date} +%H-%M) &&\
+	rm ${REMOTE_LOCK_FILE} )"
 
 # Lockfile checking
 if [ -e ${LOCK_FILE} ]; then
