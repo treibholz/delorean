@@ -1,0 +1,17 @@
+# /etc/default/delorean
+
+EXCLUDE="Maildir workspace .offlineimap Downloads gnome2/gnome-power-manager .gvfs .cache .evolution Videos Musik gpodder-downloads /usr/src/ .googleearth .kde .local .gajim/avatars/ .gconf .shotwell .goutputstream-* .thumbnails .VirtualBox .adobe .macromedia/Flash_Player .kvm .android/avd ISO "
+
+REMOTE_USER="delorean"
+
+# simple check what way to use
+if (grep -q mylocal.lan /etc/resolv.conf) ; then
+	HOST="myserver"
+else
+	HOST="myserver.homeip.net"
+
+	FLUXCAPACITOR="/usr/bin/ssh -p 22222"
+fi
+
+# vim:ft=sh
+
