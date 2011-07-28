@@ -16,12 +16,13 @@ STATUS_FILE="/var/lib/delorean.status"
 # only use real filesystems on real devices
 PATHS=$(mount | grep '^/dev' | awk '{print $3}' | tr '\n' ' ')
 
+# Just predefined for user-defined excludes.
 EXCLUDE=""
 
 ## binaries
 
 FLUXCAPACITOR="/usr/bin/ssh"
-rsync="nice -n 19 /usr/bin/rsync --delete -aHAXxv"
+rsync="/usr/bin/nice -n 19 /usr/bin/rsync --delete -aHAXxv"
 ionice="/usr/bin/ionice -c3"
 date="/bin/date"
 
@@ -34,12 +35,6 @@ export RSYNC_RSH="${FLUXCAPACITOR}"
 
 # Year/Month/Day
 today="$($date +%Y)/$($date +%m)/$($date +%d)"
-
-#if [ -e ${LAST_FILE} ] ; then
-#	if [ "$(cat ${LAST_FILE})" == "${today}" ]; then
-#		exit 0
-#	fi
-#fi
 
 ## Code
 
@@ -70,16 +65,16 @@ fi
 
 
 # Assemble the local sync-command
-rsync_opts="${exclude} ${fake_super}" 
-sync_command="${ionice} ${rsync} ${rsync_opts} ${PATHS} ${REMOTE_USER}@${HOST}:${DEST_PATH}/trunk"
+sync_command="${ionice} ${rsync} ${exclude} ${fake_super} ${PATHS} ${REMOTE_USER}@${HOST}:${DEST_PATH}/trunk"
 
 
-# Assemble the remote command to copy the data.
+# Assemble the remote command to set the hardlinks.
 remote_command="( touch ${REMOTE_LOCK_FILE} && \
 	cd ${DEST_PATH} && \
 	mkdir -p ${today} && \
-	${ionice} cp -al trunk ${today}/$(${date} +%H-%M) &&\
-	rm ${REMOTE_LOCK_FILE} )"
+	${ionice} cp -al trunk ${today}/$(${date} +%H-%M) && \
+	rm ${REMOTE_LOCK_FILE} \
+)"
 
 
 # local lockfile checking
@@ -99,11 +94,14 @@ else
 	echo ${$} >  ${LOCK_FILE}
 
 	# Now here happens the real backup.
-	if (${sync_command})  ; then
-		# Remote stuff to clean up 
+	if (${sync_command}) ; then
+
+		# if the sync was successfull, we drop the command to set the hardlinks
 		${FLUXCAPACITOR} ${REMOTE_USER}@${HOST} "${remote_command} > /dev/null & disown"
-		logger -t $(basename ${0}) Backup finished
-		echo "${today}" > ${LAST_FILE}
+
+		# write it to syslog.
+		/usr/bin/logger -t $(basename ${0}) "Backup finished"
+		$date +%s > ${LAST_FILE}
 		rm -f ${LOCK_FILE}
 	else
 		rm ${LOCK_FILE}
