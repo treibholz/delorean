@@ -27,4 +27,3 @@ A: You need an "intelligent" server, not only a USB-drive (use rsnaphot then)
    running there! You should be able to get this running on OpenWRT-based
    Wifi-router with a USB-disk. For further information, read the
    instructions in the file INSTALL.
-	o
