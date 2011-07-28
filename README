@@ -6,12 +6,12 @@ It was inspired by rsnapshot and Time Machine on Mac OS X.
 It is written in bash and uses nothing else but standard Linux-tools like
 rsync, ssh and ionice.
 
-
+TODO: better documentation.
 
 Q: Why not just use rsnapshot?
 A: rsnapshot cannot push backups through ssh, it is just able to pull them.
 
-Q: Why not TimeMachine?
+Q: Why not Time Machine?
 A: I don't have a Mac (and I don't want one)
 A: It only works fine over the network with netatalk, which is a PITA.
 
@@ -27,3 +27,4 @@ A: You need an "intelligent" server, not only a USB-drive (use rsnaphot then)
    running there! You should be able to get this running on OpenWRT-based
    Wifi-router with a USB-disk. For further information, read the
    instructions in the file INSTALL.
+	o
