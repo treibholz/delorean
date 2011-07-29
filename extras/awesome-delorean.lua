@@ -4,7 +4,7 @@
 
 -- delorean Widget (NW) {{{
 delorean = widget({ type = "imagebox"})
-delorean.image = image("/home/klaus/workspace/delorean/backup.png")
+delorean.image = image(awful.util.getdir("config") .. "/delorean-icon.png")
 
 delorean:add_signal("mouse::enter", function() add_delorean() end)
 delorean:add_signal("mouse::leave", function() rem_delorean() end)
@@ -45,7 +45,7 @@ function add_delorean()
        end
    end
 
-   backupAgo = string.format("%s%i%s", warning, ago ,unit)
+   backupAgo = string.format("last successful backup %s%i%s ago", warning, ago ,unit)
 
    deloreanInfo = naughty.notify({
 --      text = string.format('<span font_desc="%s">%s</span>', "Droid Sans Mono 8", cal),
