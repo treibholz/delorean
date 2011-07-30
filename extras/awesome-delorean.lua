@@ -8,6 +8,13 @@ delorean.image = image(awful.util.getdir("config") .. "/delorean-icon.png")
 delorean:add_signal("mouse::enter", function() add_delorean() end)
 delorean:add_signal("mouse::leave", function() rem_delorean() end)
 
+delorean:buttons(awful.util.table.join(
+   awful.button({ }, 1, function()
+		rem_delorean()
+   end)
+    )
+)
+
 function rem_delorean() -- {{{
   if deloreanInfo ~= nil then
    naughty.destroy(deloreanInfo)
@@ -66,10 +73,5 @@ function getDeloreanInfo() -- {{{
 		return backupAgo
 	end
 end -- }}}
-
-
-
-
--- delorean.text = backupAgo
 
 
