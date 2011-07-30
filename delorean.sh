@@ -9,6 +9,7 @@ REMOTE_USER=delorean
 HOST=backupserver
 DEST_PATH=${HOSTNAME}
 LOCK_FILE="/var/run/delorean.pid"
+LOG_FILE="/var/log/delorean.log"
 REMOTE_LOCK_FILE="/tmp/delorean.lock.${HOSTNAME}"
 LAST_FILE="/var/lib/delorean.lastrun"
 STATUS_FILE="/var/lib/delorean.status"
@@ -81,31 +82,31 @@ remote_command="( touch ${REMOTE_LOCK_FILE} && \
 if [ -e ${LOCK_FILE} ]; then
 	if [ -d /proc/$(cat ${LOCK_FILE}) ]; then
 		if grep ${0} /proc/$(cat ${LOCK_FILE}) ; then
-			echo "still running"
-			echo "Lockfile: ${LOCK_FILE}"
+			echo "still running" >> ${LOG_FILE}
+			echo "Lockfile: ${LOCK_FILE}" >> ${LOG_FILE}
 			exit 0
 		fi
 	fi
 # and remote lockfile checking
 elif ${FLUXCAPACITOR} ${REMOTE_USER}@${HOST} "test -e ${REMOTE_LOCK_FILE}"; then 
-			echo "Sorry, still running on the remote side."
+			echo "Sorry, still running on the remote side." >> ${LOG_FILE}
 			exit 0
 else
 	echo ${$} >  ${LOCK_FILE}
 
 	# Now here happens the real backup.
-	if (${sync_command}) ; then
+	if (${sync_command} >> ${LOG_FILE}) ; then
 
 		# if the sync was successfull, we drop the command to set the hardlinks
 		${FLUXCAPACITOR} ${REMOTE_USER}@${HOST} "${remote_command} > /dev/null & disown"
 
 		# write it to syslog.
-		/usr/bin/logger -t $(basename ${0}) "Backup finished"
+		echo "Backup finished" >> ${LOG_FILE}
 		$date +%s > ${LAST_FILE}
 		rm -f ${LOCK_FILE}
 	else
 		rm ${LOCK_FILE}
-		echo "ERROR..."
+		echo "Something went wrong. Trying again next time." >> ${LOG_FILE}
 	fi
 fi
 
