@@ -5,9 +5,9 @@
 ## Configuration
 
 # default - may be overwritten in /etc/default/delorean
-REMOTE_USER=delorean
-HOST=backupserver
-DEST_PATH=${HOSTNAME}
+REMOTE_USER="delorean"
+HOST="backupserver"
+DEST_PATH="${HOSTNAME}"
 LOCK_FILE="/var/run/delorean.pid"
 LOG_FILE="/var/log/delorean.log"
 REMOTE_LOCK_FILE="/tmp/delorean.lock.${HOSTNAME}"
@@ -15,7 +15,7 @@ LAST_FILE="/var/lib/delorean.lastrun"
 STATUS_FILE="/var/lib/delorean.status"
 
 # only use real filesystems on real devices
-PATHS=$(mount | grep '^/dev' | awk '{print $3}' | tr '\n' ' ')
+PATHS="$(mount | grep '^/dev' | awk '{print $3}' | tr '\n' ' ')"
 
 # Just predefined for user-defined excludes.
 EXCLUDE=""
@@ -24,6 +24,7 @@ EXCLUDE=""
 
 FLUXCAPACITOR="/usr/bin/ssh"
 rsync="/usr/bin/nice -n 19 /usr/bin/rsync --delete -aHAXxv"
+remote_rsync="/usr/bin/rsync"
 ionice="/usr/bin/ionice -c3"
 date="/bin/date"
 
@@ -45,7 +46,11 @@ host $HOST > /dev/null 2> /dev/null || exit 0
 # These are the files, I find useless to backup on a desktop/notebook computer.
 # I'm open to suggestions here!
 
-SYS_EXCLUDE="/var/cache/apt/ tmp/ /var/run/ /var/lib/apt/lists/ /var/lib/clamav/ /var/lib/upower/ /var/lib/sudo/ /var/spool/exim4/ /var/log/ /var/mail/ $LAST_FILE /var/cache/openafs $LOCK_FILE mlocate.db var/cache/samba/ .xsession-errors etc/resolv.conf .*.swp etc/mtab var/lib/dhcp/ dev/ var/cache/man/"
+SYS_EXCLUDE="/var/cache/apt/ tmp/ /var/run/ /var/lib/apt/lists/ /var/lib/clamav/ \
+	/var/lib/upower/ /var/lib/sudo/ /var/spool/exim4/ /var/log/ /var/mail/ \
+	$LAST_FILE /var/cache/openafs $LOCK_FILE mlocate.db var/cache/samba/ \
+	.xsession-errors etc/resolv.conf .*.swp etc/mtab var/lib/dhcp/ dev/ \
+	var/cache/man/"
 
 ALL_EXCLUDE="$SYS_EXCLUDE $EXCLUDE"
 
@@ -59,7 +64,7 @@ done
 # with "-o user_xattrs"
 
 if [ "x${REMOTE_USER}" != "xroot" ] ; then
-	fake_super="--rsync-path=/usr/bin/rsync --fake-super"
+	fake_super="--rsync-path=${remote_rsync} --fake-super"
 else
 	fake_super=''
 fi
