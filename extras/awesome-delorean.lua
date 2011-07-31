@@ -66,12 +66,15 @@ function getDeloreanInfo() -- {{{
 					end
 				end
 			end
+		else
+			message = string.format("%is", ago)
 		end
-
 		backupAgo = warning .. "last successful backup " .. message .. " ago"
-	
-		return backupAgo
+
 	end
+	
+	return backupAgo
 end -- }}}
+
 
 
