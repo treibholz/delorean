@@ -13,7 +13,8 @@ A: rsnapshot cannot push backups through ssh, it is just able to pull them.
 
 Q: Why not Time Machine?
 A: I don't have a Mac (and I don't want one)
-A: It only works fine over the network with netatalk, which is a PITA.
+A: It only works fine over the network with AFP, which is a PITA with
+   netatalk.
 
 Q: So what are the advantages and uniqe features of delorean?
 A: It pushes backups via ssh to a server and then drops the copy-as-hardlinks-
