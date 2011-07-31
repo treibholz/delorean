@@ -13,6 +13,7 @@ LOG_FILE="/var/log/delorean.log"
 REMOTE_LOCK_FILE="/tmp/delorean.lock.${HOSTNAME}"
 LAST_FILE="/var/lib/delorean.lastrun"
 STATUS_FILE="/var/lib/delorean.status"
+DISABLE_MOBILE="yes"
 
 # only use real filesystems on real devices
 PATHS="$(mount | grep '^/dev' | awk '{print $3}' | tr '\n' ' ')"
@@ -41,10 +42,29 @@ today="$($date +%Y)/$($date +%m)/$($date +%d)"
 ## Code
 
 # minimal check if the host is there
-host $HOST > /dev/null 2> /dev/null || exit 0
+if ! host $HOST > /dev/null 2> /dev/null ; then
+	echo "Backuphost $HOST not reachable, no backup now." >> ${LOG_FILE}
+	exit 0 
+fi
 
-# These are the files, I find useless to backup on a desktop/notebook computer.
-# I'm open to suggestions here!
+# get the currently used network device type
+netDeviceType=$(/bin/ip route | \
+		grep default | \
+		head | \
+		cut -d ' ' -f 5 | \
+		sed -e 's/[0-9]*//g' \
+	)
+
+# if using a mobile network, stop here.
+if [ "x${DISABLE_MOBILE}" == "xyes" ]; then
+	if [ "x${netDeviceType}" == "xppp" ]; then
+		echo "Currently mobile, no backup now." >> ${LOG_FILE}
+		exit 0
+	fi
+fi
+
+# These are the files/directories, I find useless to backup on a
+# desktop/notebook computer.  I'm open to suggestions here!
 
 SYS_EXCLUDE="/var/cache/apt/ tmp/ /var/run/ /var/lib/apt/lists/ /var/lib/clamav/ \
 	/var/lib/upower/ /var/lib/sudo/ /var/spool/exim4/ /var/log/ /var/mail/ \
