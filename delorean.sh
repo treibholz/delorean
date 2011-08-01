@@ -37,12 +37,17 @@ export RSYNC_RSH="${FLUXCAPACITOR}"
 # TODO: CLI-parameters
 
 # Year/Month/Day
-today="$($date +%Y)/$($date +%m)/$($date +%d)"
+today="$(${date} +%Y)/$(${date} +%m)/$(${date} +%d)"
 
 function loginfo () {
-	message="$1"
-	echo "$(${date} +%Y-%M-%d\ %H:%M:%S) ${message}" >> ${LOG_FILE}
-	echo "${message}" > ${STATUS_FILE}
+	message="${1}"
+	while read i; do
+		echo "[STATUS: INFO] $(${date} +%Y-%M-%d\ %H:%M:%S) ${i}" >> ${LOG_FILE}
+	done <<< "$message"
+
+	if [ "x${2}" != "xNOSTATUS]" ] ; then
+		echo "${message}" > ${STATUS_FILE}
+	fi
 }
 
 ## MAIN
@@ -125,7 +130,8 @@ else
 	echo ${$} >  ${LOCK_FILE}
 
 	# Now here happens the real backup.
-	if (${sync_command} >> ${LOG_FILE}) ; then # TODO: sane logging
+	loginfo "Backup started"
+	if (${sync_command} >> ${LOG_FILE}); then # TODO: sane logging
 
 		# if the sync was successfull, we drop the command to set the hardlinks
 		${FLUXCAPACITOR} ${REMOTE_USER}@${HOST} "${remote_command} > /dev/null & disown"
