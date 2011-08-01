@@ -39,11 +39,17 @@ export RSYNC_RSH="${FLUXCAPACITOR}"
 # Year/Month/Day
 today="$($date +%Y)/$($date +%m)/$($date +%d)"
 
-## Code
+function loginfo () {
+	message="$1"
+	echo "$(${date} +%Y-%M-%d\ %H:%M:%S) ${message}" >> ${LOG_FILE}
+	echo "${message}" > ${STATUS_FILE}
+}
+
+## MAIN
 
 # minimal check if the host is there
 if ! host $HOST > /dev/null 2> /dev/null ; then
-	echo "Backuphost $HOST not reachable, no backup now." >> ${LOG_FILE}
+	loginfo "Backuphost $HOST not reachable, no backup now."
 	exit 0 
 fi
 
@@ -58,7 +64,7 @@ netDeviceType=$(/bin/ip route | \
 # if using a mobile network, stop here.
 if [ "x${DISABLE_MOBILE}" == "xyes" ]; then
 	if [ "x${netDeviceType}" == "xppp" ]; then
-		echo "Currently mobile, no backup now." >> ${LOG_FILE}
+		loginfo "Currently mobile, no backup now."
 		exit 0
 	fi
 fi
@@ -107,31 +113,30 @@ remote_command="( touch ${REMOTE_LOCK_FILE} && \
 if [ -e ${LOCK_FILE} ]; then
 	if [ -d /proc/$(cat ${LOCK_FILE}) ]; then
 		if grep ${0} /proc/$(cat ${LOCK_FILE}) ; then
-			echo "still running" >> ${LOG_FILE}
-			echo "Lockfile: ${LOCK_FILE}" >> ${LOG_FILE}
+			loginfo "still running"
 			exit 0
 		fi
 	fi
 # and remote lockfile checking
 elif ${FLUXCAPACITOR} ${REMOTE_USER}@${HOST} "test -e ${REMOTE_LOCK_FILE}"; then 
-			echo "Sorry, still running on the remote side." >> ${LOG_FILE}
+			ligoinfo "Still running on the remote side."
 			exit 0
 else
 	echo ${$} >  ${LOCK_FILE}
 
 	# Now here happens the real backup.
-	if (${sync_command} >> ${LOG_FILE}) ; then
+	if (${sync_command} >> ${LOG_FILE}) ; then # TODO: sane logging
 
 		# if the sync was successfull, we drop the command to set the hardlinks
 		${FLUXCAPACITOR} ${REMOTE_USER}@${HOST} "${remote_command} > /dev/null & disown"
 
 		# write it to syslog.
-		echo "Backup finished" >> ${LOG_FILE}
+		loginfo "Backup finished"
 		$date +%s > ${LAST_FILE}
 		rm -f ${LOCK_FILE}
 	else
 		rm ${LOCK_FILE}
-		echo "Something went wrong. Trying again next time." >> ${LOG_FILE}
+		loginfo "Something went wrong. Trying again next time."
 	fi
 fi
 
