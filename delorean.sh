@@ -16,7 +16,7 @@ STATUS_FILE="/var/lib/delorean.status"
 DISABLE_MOBILE="yes"
 
 # only use real filesystems on real devices
-PATHS="$(mount | grep '^/dev' | awk '{print $3}' | tr '\n' ' ')"
+PATHS="$(mount | grep '^/dev' | grep -v 'helper=udisks' | awk '{print $3}' | tr '\n' ' ')"
 
 # Just predefined for user-defined excludes.
 EXCLUDE=""
@@ -81,7 +81,7 @@ SYS_EXCLUDE="/var/cache/apt/ tmp/ /var/run/ /var/lib/apt/lists/ /var/lib/clamav/
 	/var/lib/upower/ /var/lib/sudo/ /var/spool/exim4/ /var/log/ /var/mail/ \
 	$LAST_FILE /var/cache/openafs $LOCK_FILE mlocate.db var/cache/samba/ \
 	.xsession-errors etc/resolv.conf .*.swp etc/mtab var/lib/dhcp/ dev/ \
-	var/cache/man/ $STATUS_FILE /media/"
+	var/cache/man/ $STATUS_FILE"
 
 ALL_EXCLUDE="$SYS_EXCLUDE $EXCLUDE"
 
