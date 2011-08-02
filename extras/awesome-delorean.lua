@@ -42,6 +42,8 @@ function getDeloreanInfo() -- {{{
 	else
 		f = io.open("/var/lib/delorean.lastrun","r")
 		lastBackup = f:read("*line")
+		s = io.open("/var/lib/delorean.status","r")
+		status = s:read("*line")
 
 		ago=os.time()-lastBackup
 		warning = ""
@@ -69,7 +71,8 @@ function getDeloreanInfo() -- {{{
 		else
 			message = string.format("%is", ago)
 		end
-		backupAgo = warning .. "last successful backup " .. message .. " ago"
+		backupAgo = warning .. "successful backup <b>" .. message .. "</b> ago"
+		backupAgo = backupAgo .. '<br>Status: <i>' .. status .. '</i>'
 
 	end
 	
