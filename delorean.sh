@@ -137,7 +137,7 @@ else
 		${FLUXCAPACITOR} ${REMOTE_USER}@${HOST} "${remote_command} > /dev/null & disown"
 
 		# write it to syslog.
-		loginfo "Backup successfully."
+		loginfo "Backup successfull"
 		$date +%s > ${LAST_FILE}
 		rm -f ${LOCK_FILE}
 	else
