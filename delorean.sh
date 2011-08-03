@@ -133,11 +133,11 @@ else
 	loginfo "Backup started"
 	if (${sync_command} >> ${LOG_FILE}); then # TODO: sane logging
 
-		# if the sync was successfull, we drop the command to set the hardlinks
+		# if the sync was successful, we drop the command to set the hardlinks
 		${FLUXCAPACITOR} ${REMOTE_USER}@${HOST} "${remote_command} > /dev/null & disown"
 
 		# write it to syslog.
-		loginfo "Backup successfull"
+		loginfo "Backup successful"
 		$date +%s > ${LAST_FILE}
 		rm -f ${LOCK_FILE}
 	else
