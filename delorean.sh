@@ -16,7 +16,7 @@ STATUS_FILE="/var/lib/delorean.status"
 DISABLE_MOBILE="yes"
 
 # only use real filesystems on real devices
-PATHS="$(mount | grep '^/dev' | grep -v 'helper=udisks' | awk '{print $3}' | tr '\n' ' ')"
+PATHS="$(mount | grep '^/dev' | egrep -v '(iso9660|helper=udisks)' | awk '{print $3}' | tr '\n' ' ')"
 
 # Just predefined for user-defined excludes.
 EXCLUDE=""
