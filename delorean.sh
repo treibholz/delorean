@@ -37,7 +37,7 @@ export RSYNC_RSH="${FLUXCAPACITOR}"
 # TODO: CLI-parameters
 
 # Year/Month/Day
-today="$(${date} +%Y)/$(${date} +%m)/$(${date} +%d)"
+today="$(${date} +%Y/%m/%d)"
 
 function loginfo () {
 	message="${1}"
