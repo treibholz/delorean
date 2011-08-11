@@ -111,8 +111,8 @@ remote_command="( touch ${REMOTE_LOCK_FILE} && \
 	cd ${DEST_PATH} && \
 	mkdir -p ${today} && \
 	${ionice} cp -al trunk ${today}/$(${date} +%H-%M) && \
-	rm ${REMOTE_LOCK_FILE} \
-) 2>&1 > ${REMOTE_LOG_FILE}"
+	rm ${REMOTE_LOCK_FILE} || echo error >> ${REMOTE_LOG_FILE} \
+)"
 
 
 # local lockfile checking
