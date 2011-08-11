@@ -11,6 +11,7 @@ DEST_PATH="${HOSTNAME}"
 LOCK_FILE="/var/run/delorean.pid"
 LOG_FILE="/var/log/delorean.log"
 REMOTE_LOCK_FILE="/tmp/delorean.lock.${HOSTNAME}"
+REMOTE_LOG_FILE="delorean.log.${HOSTNAME}"
 LAST_FILE="/var/lib/delorean.lastrun"
 STATUS_FILE="/var/lib/delorean.status"
 DISABLE_MOBILE="yes"
@@ -111,7 +112,7 @@ remote_command="( touch ${REMOTE_LOCK_FILE} && \
 	mkdir -p ${today} && \
 	${ionice} cp -al trunk ${today}/$(${date} +%H-%M) && \
 	rm ${REMOTE_LOCK_FILE} \
-)"
+) 2>&1 > ${REMOTE_LOG_FILE}"
 
 
 # local lockfile checking
