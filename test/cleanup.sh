@@ -7,10 +7,11 @@ export DAY=$((60*60*24))
 export WEEK=$((DAY*7))
 export MONTH=$((DAY*30))
 export YEAR=$((DAY*365))
+now=$(date +%s)
 
 
 function create_test_dirs () { # {{{
-		for j in $(seq 1 24); do
+		for j in $(seq 1 5); do
 			for i in $(seq 1 365); do
 				Date=$(date -d "- $i days - $j hours" +%Y/%m/%d/%H-%M)
 				mkdir -p /tmp/delorean/$Date
@@ -20,7 +21,7 @@ function create_test_dirs () { # {{{
 } # }}}
 
 function cleanup () { # {{{
-	
+
 	timediff=$((now - DATE))
 
 	years_ago=$((timediff / YEAR))
@@ -28,16 +29,33 @@ function cleanup () { # {{{
 	weeks_ago=$((timediff / WEEK))
 	days_ago=$((timediff / DAY))
 
-
-	# delete if older than one year. Who really needs Backups that age?
-	
-	if [ -z "${months[${months_ago}]}" ]; then
-		months[${months_ago}]=$DATE
-		echo ${months[${months_ago}]}
-	else
-		rm -rf "$i"
+	if [ $months_ago -gt 2 ] ; then 
+		if [ -z "${months[${months_ago}]}" ]; then
+			months[${months_ago}]=$DATE
+		else
+			echo "Cleaning $i"
+			rm -rf "$i"
+		fi
+	elif [ $weeks_ago -gt 4 ] ; then 
+		if [ -z "${weeks[${weeks_ago}]}" ]; then
+			weeks[${weeks_ago}]=$DATE
+		else
+			echo "Cleaning $i"
+			rm -rf "$i"
+		fi
+	elif [ $days_ago -gt 7 ] ; then 
+		if [ -z "${days[${days_ago}]}" ]; then
+			days[${days_ago}]=$DATE
+		else
+			echo "Cleaning $i"
+			rm -rf "$i"
+		fi
 	fi
-	
+
+
+
+
+
 } # }}}
 
 function cleanup_run () { # {{{
