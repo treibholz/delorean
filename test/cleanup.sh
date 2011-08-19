@@ -2,52 +2,25 @@
 
 echo "NOT YET WORKING"
 
-case "$1" in
+# Timeperiods in seconds
+export DAY=$((60*60*24))
+export WEEK=$((DAY*7))
+export MONTH=$((DAY*30))
+export YEAR=$((DAY*365))
 
-	create)
+
+function create_test_dirs () { # {{{
 		for j in $(seq 1 24); do
 			for i in $(seq 1 365); do
-				mkdir -p /tmp/delorean/$(date -d "- $i days - $j hours" +%Y/%m/%d/%H-%M)
+				Date=$(date -d "- $i days - $j hours" +%Y/%m/%d/%H-%M)
+				mkdir -p /tmp/delorean/$Date
+				touch /tmp/delorean/$Date/test.foo
 			done
 		done
-	;;
-	*)
-	;;
-esac
+} # }}}
 
-cd /tmp/delorean/ || exit 1
-
-weekago=$(date -d '1 week ago' +%s)
-monthago=$(date -d '1 month ago' +%s)
-yearago=$(date -d '1 year ago' +%s)
-now=$(date +%s)
-
-# Timeperiods in seconds
-DAY=$((60*60*24))
-WEEK=$((DAY*7))
-MONTH=$((DAY*30))
-YEAR=$((DAY*365))
-
-
-find -maxdepth 4 | while read i; do
-
-#	TIMEFORMAT="+%Y%m%W%d%H%M"
-	TIMEFORMAT="+%s"
-	# DATE is the date encoded in the path of the backups converted to YYYYMMWWDDHHmm
-	if   DATE=$(date -d "${i:2:10} ${i:13:2}:${i:16:2}" $TIMEFORMAT 2> /dev/null); then
-		true
-	elif DATE=$(date -d "${i:2:10}" $TIMEFORMAT 2>/dev/null); then
-		#echo $DATE > /dev/null
-		true
-
-	elif DATE=$(date -d "${i:2:7}" $TIMEFORMAT 2> /dev/null); then
-		#echo $DATE
-		true
-
-	else
-		echo $i
-	fi
-
+function cleanup () { # {{{
+	
 	timediff=$((now - DATE))
 
 	years_ago=$((timediff / YEAR))
@@ -55,16 +28,70 @@ find -maxdepth 4 | while read i; do
 	weeks_ago=$((timediff / WEEK))
 	days_ago=$((timediff / DAY))
 
-	echo $days_ago
 
 	# delete if older than one year. Who really needs Backups that age?
-	#if [ $DATE -lt $yearago ]; then
-	#	echo $i
-	# delete if older than one month if one os already spared
-	#elif [ $DATE -lt $monthago ]; then
-	#	true
-	#fi 
+	
+	if [ -z "${months[${months_ago}]}" ]; then
+		months[${months_ago}]=$DATE
+		echo ${months[${months_ago}]}
+	else
+		rm -rf "$i"
+	fi
+	
+} # }}}
 
-done
+function cleanup_run () { # {{{
 
-cd -
+	cd /tmp/delorean/ || exit 1
+	find -maxdepth 4 | while read i; do
+
+	#	TIMEFORMAT="+%Y%m%W%d%H%M"
+		TIMEFORMAT="+%s"
+		# DATE is the date encoded in the path of the backups converted to YYYYMMWWDDHHmm
+		if DATE=$(date -d "${i:2:10} ${i:13:2}:${i:16:2}" $TIMEFORMAT 2> /dev/null); then
+			export DATE
+			cleanup
+		elif DATE=$(date -d "${i:2:10}" $TIMEFORMAT 2>/dev/null); then
+			#echo $DATE > /dev/null
+			true
+
+		elif DATE=$(date -d "${i:2:7}" $TIMEFORMAT 2> /dev/null); then
+			#echo $DATE
+			true
+
+		else
+			true
+		fi
+		
+
+		#	echo $i
+		# delete if older than one month if one os already spared
+		#elif [ $DATE -lt $monthago ]; then
+		#	true
+		#fi 
+
+	done
+
+	cd -
+
+} # }}}
+
+
+case "$1" in
+	create)
+		create_test_dirs
+	;;
+	clean)
+		cleanup_run
+	;;
+	all)
+		$0 create
+		$0 clean
+	;;
+	*)
+		echo "RTFS!"
+		exit 23
+	;;
+esac
+
+
