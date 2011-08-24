@@ -70,12 +70,14 @@ function cleanup_run () { # {{{
 			export DATE
 			cleanup
 		elif DATE=$(date -d "${i:2:10}" $TIMEFORMAT 2>/dev/null); then
-			#echo $DATE > /dev/null
-			true
+			if [ "x" = "x$(ls ${i})" ] ; then
+				rm -rf ${i}
+			fi
 
 		elif DATE=$(date -d "${i:2:7}" $TIMEFORMAT 2> /dev/null); then
-			#echo $DATE
-			true
+			if [ "x" = "x$(ls ${i})" ] ; then
+				rm -rf ${i}
+			fi
 
 		else
 			true
@@ -100,6 +102,8 @@ case "$1" in
 		create_test_dirs
 	;;
 	clean)
+		# run twice
+		cleanup_run
 		cleanup_run
 	;;
 	all)
