@@ -16,8 +16,8 @@ LAST_FILE="/var/lib/delorean.lastrun"
 STATUS_FILE="/var/lib/delorean.status"
 DISABLE_MOBILE="yes"
 
-# only use real filesystems on real devices
-PATHS="$(mount | grep '^/dev' | egrep -v '(iso9660|helper=udisks)' | awk '{print $3}' | tr '\n' ' ')"
+# only use real filesystems on real devices, no CDROM/DVDs
+PATHS="$(mount | grep '^/dev' | egrep -v '(udf|iso9660|helper=udisks)' | awk '{print $3}' | tr '\n' ' ')"
 
 # Just predefined for user-defined excludes.
 EXCLUDE=""
