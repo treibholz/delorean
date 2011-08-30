@@ -78,9 +78,9 @@ fi
 # These are the files/directories, I find useless to backup on a
 # desktop/notebook computer.  I'm open to suggestions here!
 
-SYS_EXCLUDE="/var/cache/apt/ tmp/ /var/run/ /var/lib/apt/lists/ /var/lib/clamav/ \
-	/var/lib/upower/ /var/lib/sudo/ /var/spool/exim4/ /var/log/ /var/mail/ \
-	$LAST_FILE /var/cache/openafs $LOCK_FILE mlocate.db var/cache/samba/ \
+SYS_EXCLUDE="var/cache/apt/ tmp/ var/run/ var/lib/apt/lists/ var/lib/clamav/ \
+	var/lib/upower/ var/lib/sudo/ var/spool/exim4/ var/log/ var/mail/ \
+	$LAST_FILE var/cache/openafs $LOCK_FILE mlocate.db var/cache/samba/ \
 	.xsession-errors etc/resolv.conf .*.swp etc/mtab var/lib/dhcp/ dev/ \
 	var/cache/man/ $STATUS_FILE var/cache/system-tools-backends"
 
