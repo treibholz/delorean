@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "NOT YET WORKING"
+export LANG=C
 
 # Timeperiods in seconds
 export DAY=$((60*60*24))
@@ -29,43 +29,43 @@ function cleanup () { # {{{
 	weeks_ago=$((timediff / WEEK))
 	days_ago=$((timediff / DAY))
 
-	if [ $months_ago -gt 2 ] ; then 
+	if [ ${months_ago} -gt 2 ] ; then 
 		if [ -z "${months[${months_ago}]}" ]; then
-			months[${months_ago}]=$DATE
+			months[${months_ago}]=${DATE}
 		else
-			echo "Cleaning $i"
-			rm -rf "$i"
+			echo "Cleaning ${i}"
+			rm -rf "${i}"
 		fi
-	elif [ $weeks_ago -gt 4 ] ; then 
+	elif [ ${weeks_ago} -gt 4 ] ; then 
 		if [ -z "${weeks[${weeks_ago}]}" ]; then
-			weeks[${weeks_ago}]=$DATE
+			weeks[${weeks_ago}]=${DATE}
 		else
-			echo "Cleaning $i"
-			rm -rf "$i"
+			echo "Cleaning ${i}"
+			rm -rf "${i}"
 		fi
-	elif [ $days_ago -gt 7 ] ; then 
+	elif [ ${days_ago} -gt 7 ] ; then 
 		if [ -z "${days[${days_ago}]}" ]; then
-			days[${days_ago}]=$DATE
+			days[${days_ago}]=${DATE}
 		else
-			echo "Cleaning $i"
-			rm -rf "$i"
+			echo "Cleaning ${i}"
+			rm -rf "${i}"
 		fi
 	fi
-
-
-
-
 
 } # }}}
 
 function cleanup_run () { # {{{
 
-	cd /tmp/delorean/ || exit 1
-	find -maxdepth 4 | while read i; do
+	if [ "x${DEST_PATH}" == "x" ]; then
+		echo "${DEST_PATH} not found"
+		exit 2
+	fi
 
-	#	TIMEFORMAT="+%Y%m%W%d%H%M"
+	cd $DEST_PATH || exit 1
+
+	find 2* -maxdepth 4 | while read i; do
+
 		TIMEFORMAT="+%s"
-		# DATE is the date encoded in the path of the backups converted to YYYYMMWWDDHHmm
 		if DATE=$(date -d "${i:2:10} ${i:13:2}:${i:16:2}" $TIMEFORMAT 2> /dev/null); then
 			export DATE
 			cleanup
@@ -83,13 +83,6 @@ function cleanup_run () { # {{{
 			true
 		fi
 		
-
-		#	echo $i
-		# delete if older than one month if one os already spared
-		#elif [ $DATE -lt $monthago ]; then
-		#	true
-		#fi 
-
 	done
 
 	cd -
@@ -103,6 +96,7 @@ case "$1" in
 	;;
 	clean)
 		# run twice
+		export DEST_PATH="${2}"
 		cleanup_run
 		cleanup_run
 	;;
