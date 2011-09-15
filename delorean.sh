@@ -6,6 +6,7 @@
 
 # default - may be overwritten in /etc/default/delorean
 REMOTE_USER="delorean"
+MAIL="user@domain.tld"
 HOST="backupserver"
 DEST_PATH="${HOSTNAME}"
 LOCK_FILE="/var/run/delorean.pid"
@@ -111,8 +112,7 @@ remote_command="( touch ${REMOTE_LOCK_FILE} && \
 	cd ${DEST_PATH} && \
 	mkdir -p ${today} && \
 	${ionice} cp -al trunk ${today}/$(${date} +%H-%M) && \
-	rm ${REMOTE_LOCK_FILE} || echo error >> ${REMOTE_LOG_FILE} \
-)"
+	rm ${REMOTE_LOCK_FILE} ) | mail -E -s "Delorean Remote Message" ${MAIL} 2>&1 "
 
 
 # local lockfile checking
