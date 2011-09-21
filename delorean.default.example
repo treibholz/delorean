@@ -21,6 +21,7 @@ HOST="myserver"
 #	FLUXCAPACITOR="/usr/bin/ssh -p 22222"
 #fi
 
+#MAIL="user@domain.tld"
 
 # vim:ft=sh
 

@@ -112,7 +112,7 @@ remote_command="( touch ${REMOTE_LOCK_FILE} && \
 	cd ${DEST_PATH} && \
 	mkdir -p ${today} && \
 	${ionice} cp -al trunk ${today}/$(${date} +%H-%M) && \
-	rm ${REMOTE_LOCK_FILE} ) | mail -E -s "Delorean Remote Message" ${MAIL} 2>&1 "
+	rm ${REMOTE_LOCK_FILE} )2>&1 "
 
 
 # local lockfile checking
@@ -135,7 +135,8 @@ else
 	if (${sync_command} >> ${LOG_FILE}); then # TODO: sane logging
 
 		# if the sync was successful, we drop the command to set the hardlinks
-		${FLUXCAPACITOR} ${REMOTE_USER}@${HOST} "${remote_command} > /dev/null & disown"
+		${FLUXCAPACITOR} ${REMOTE_USER}@${HOST} "( ${remote_command} | mail -E -s 'Delorean Remote Message' ${MAIL} >/dev/null 2>&1 & disown )"
+#		${FLUXCAPACITOR} ${REMOTE_USER}@${HOST} "${remote_command} > /dev/null & disown"
 
 		# write it to syslog.
 		loginfo "Backup successful"
