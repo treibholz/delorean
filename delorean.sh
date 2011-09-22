@@ -34,6 +34,8 @@ date="/bin/date"
 # Read external configuration, if available
 test -e /etc/default/delorean && source /etc/default/delorean
 
+remote_message_command="/usr/bin/mail -E -s 'Delorean: Remote error on ${HOST}' ${MAIL}"
+
 export RSYNC_RSH="${FLUXCAPACITOR}"
 
 # TODO: CLI-parameters
@@ -41,7 +43,7 @@ export RSYNC_RSH="${FLUXCAPACITOR}"
 # Year/Month/Day
 today="$(${date} +%Y/%m/%d)"
 
-function loginfo () {
+function loginfo () { # {{{
 	message="${1}"
 	while read i; do
 		echo "[STATUS: INFO] $(${date} +%Y-%M-%d\ %H:%M:%S) ${i}" >> ${LOG_FILE}
@@ -50,7 +52,7 @@ function loginfo () {
 	if [ "x${2}" != "xNOSTATUS]" ] ; then
 		echo "${message}" > ${STATUS_FILE}
 	fi
-}
+} # }}}
 
 ## MAIN
 
@@ -135,8 +137,7 @@ else
 	if (${sync_command} >> ${LOG_FILE}); then # TODO: sane logging
 
 		# if the sync was successful, we drop the command to set the hardlinks
-		${FLUXCAPACITOR} ${REMOTE_USER}@${HOST} "( ${remote_command} | mail -E -s 'Delorean Remote Message' ${MAIL} >/dev/null 2>&1 & disown )"
-#		${FLUXCAPACITOR} ${REMOTE_USER}@${HOST} "${remote_command} > /dev/null & disown"
+		${FLUXCAPACITOR} ${REMOTE_USER}@${HOST} "( ${remote_command} | ${remote_message_command} >/dev/null 2>&1 & disown )"
 
 		# write it to syslog.
 		loginfo "Backup successful"
