@@ -43,7 +43,7 @@ export RSYNC_RSH="${FLUXCAPACITOR}"
 # Year/Month/Day
 today="$(${date} +%Y/%m/%d)"
 
-function loginfo () { # {{{
+function loginfo () { # {{{ Do the logging and update statusfile
 	message="${1}"
 	while read i; do
 		echo "[STATUS: INFO] $(${date} +%Y-%M-%d\ %H:%M:%S) ${i}" >> ${LOG_FILE}
@@ -113,7 +113,7 @@ sync_command="${ionice} ${rsync} ${exclude} ${fake_super} ${PATHS} ${REMOTE_USER
 remote_command="( touch ${REMOTE_LOCK_FILE} && \
 	cd ${DEST_PATH} && \
 	mkdir -p ${today} && \
-	${ionice} cp -al trunk ${today}/$(${date} +%H-%M) && \
+	${ionice} nice -19 cp -al trunk ${today}/$(${date} +%H-%M) && \
 	rm ${REMOTE_LOCK_FILE} )2>&1 "
 
 
