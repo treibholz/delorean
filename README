@@ -8,6 +8,14 @@ rsync, ssh and ionice.
 
 TODO: better documentation.
 
+!!! WARNING !!!
+
+I just realized, a full system-revovery might not be possible at the moment.
+This does not affect the data, but maybe (some of) the permissions, attributes
+and ACLs. I'm not really sure yet, maybe I'm just to stupid to recover. However
+delorean still is great if you need to recover specific files. I will fix this
+as soon as my notebook is fully functional again. :-(
+
 Q: Why not just use rsnapshot?
 A: rsnapshot cannot push backups through ssh, it is just able to pull them.
 
